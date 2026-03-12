@@ -1,0 +1,20 @@
+# SPA fallback para Apache (Raiola) - Subcarpeta
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /portfolio-oksap/
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /portfolio-oksap/index.html [L]
+</IfModule>
+
+# Cache estática opcional
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/javascript "access plus 1 year"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>

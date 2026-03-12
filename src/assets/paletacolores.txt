@@ -1,0 +1,26 @@
+🎨 Colores de Marca (Principales)
+Navy (Azul Oscuro Profundo): #0F1C48
+Uso: Parte superior del degradado del Hero, cabecera del Chat, inicio del degradado de la tarjeta "Sobre OKSAP".
+Silver (Gris Azulado Claro): #B3C5E4
+Uso: Parte inferior del degradado del Hero, textos secundarios sobre fondos oscuros.
+Accent (Azul Medio): #3066BE
+Uso: Burbujas de chat del usuario, detalles de acento.
+Dark (Gris Púrpura Oscuro): #3C3744
+Uso: Textos principales (títulos), final del degradado de la tarjeta "Sobre OKSAP".
+🖥️ Interfaz y Fondos
+Blanco: #FFFFFF
+Uso: Fondo general de la página, fondo del contenedor del chat, textos sobre fondos oscuros.
+Gris Claro (Cards): #DDDDDD
+Uso: Fondo de las tarjetas de servicios, tarjeta de ubicación (footer) y fondo del área de mensajes del chat.
+Gris Medio (Botón): #666666
+Uso: Fondo del botón "Compartir".
+📱 Redes Sociales (Hover)
+LinkedIn: #0077b5
+Instagram: #E1306C
+TikTok: #FE2C55
+X (Twitter): #000000 (Negro)
+🌈 Otros (Configurados pero secundarios/en desuso)
+Light (Crema): #FBFFF1 (En configuración base)
+Primary (Azul Eléctrico): #4361EE
+Sky (Azul Cielo): #4895EF
+Mint (Cian): `#4CC9F0

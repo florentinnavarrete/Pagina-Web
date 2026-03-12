@@ -1,0 +1,15 @@
+:root {
+  --oksap-background-hex: #000000;
+  --oksap-primary-hex: #666666;
+  --oksap-accent-hex: #F5A7CB;
+  --oksap-navy-hex: #DDDDDD;
+  --oksap-silver-hex: #CBEEF3;
+
+  --oksap-background: 0 0 0;
+  --oksap-primary: 102 102 102;
+  --oksap-accent: 245 167 203;
+  --oksap-navy: 221 221 221;
+  --oksap-silver: 203 238 243;
+  --oksap-dark: 102 102 102;
+  --oksap-dark-hex: var(--oksap-primary-hex);
+}
