@@ -71,6 +71,7 @@ const Services: React.FC = () => {
               trigger: scopeRef.current,
               start: 'top 84%',
               once: true,
+              invalidateOnRefresh: true,
             },
           },
         );
@@ -115,6 +116,7 @@ const Services: React.FC = () => {
                 start: 'top top',
                 end: () => `+=${getMaxShift() + window.innerHeight * 0.7}`,
                 scrub: 1,
+                invalidateOnRefresh: true,
               },
             },
           );
@@ -135,6 +137,7 @@ const Services: React.FC = () => {
               trigger: scopeRef.current,
               start: 'top 82%',
               once: true,
+              invalidateOnRefresh: true,
             },
           },
         );
@@ -181,6 +184,7 @@ const Services: React.FC = () => {
               trigger: scopeRef.current,
               start: 'top 88%',
               once: true,
+              invalidateOnRefresh: true,
             },
           },
         );

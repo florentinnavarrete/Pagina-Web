@@ -1,0 +1,395 @@
+/* ============================================================
+   Contact Section — Awwwards Minimalist Redesign
+   ============================================================ */
+
+/* ── Section wrapper ── */
+.contact-new {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: 6rem 0 5rem;
+  overflow: hidden;
+}
+
+/* ── Two-column grid ── */
+.contact-new__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4.5rem;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+@media (min-width: 1024px) {
+  .contact-new__grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0 9%;
+    align-items: start;
+  }
+}
+
+/* ── Left column ── */
+.contact-new__left {
+  display: flex;
+  flex-direction: column;
+  gap: 2.8rem;
+}
+
+.contact-new__eyebrow {
+  font-size: 0.69rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgb(var(--oksap-silver) / 0.5);
+}
+
+/* Masked headline lines */
+.contact-new__headline-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-new__headline-line {
+  display: block;
+  overflow: hidden;
+  line-height: 1.0;
+  padding-bottom: 0.06em; /* prevent descender clip */
+}
+
+.contact-new__headline-inner {
+  display: block;
+  font-family: 'Sora', ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2.8rem, 7.2vw, 5.8rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  color: rgb(var(--oksap-navy));
+  will-change: transform;
+  line-height: 1.05;
+}
+
+.contact-new__headline-inner--accent {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgb(var(--oksap-silver) / 0.5);
+}
+
+/* ── Info area ── */
+.contact-new__info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid rgb(255 255 255 / 0.07);
+}
+
+.contact-new__info-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.contact-new__info-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(var(--oksap-silver) / 0.38);
+  min-width: 4rem;
+  flex-shrink: 0;
+}
+
+.contact-new__info-value {
+  font-size: 0.88rem;
+  font-weight: 400;
+  color: rgb(var(--oksap-navy) / 0.78);
+  text-decoration: none;
+  transition: color 220ms ease;
+}
+
+.contact-new__info-value:hover {
+  color: rgb(var(--oksap-silver));
+}
+
+.contact-new__socials-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem 1.1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.contact-new__social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.22rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: rgb(var(--oksap-navy) / 0.66);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 1px;
+  transition: color 220ms ease, border-color 220ms ease;
+}
+
+.contact-new__social-link:hover {
+  color: rgb(var(--oksap-silver));
+  border-color: rgb(var(--oksap-silver) / 0.42);
+}
+
+/* ── Right column ── */
+.contact-new__right {
+  position: relative;
+}
+
+.contact-new__form-area {
+  position: relative;
+  min-height: 26rem;
+}
+
+/* ── Form ── */
+.contact-new__form {
+  display: flex;
+  flex-direction: column;
+  gap: 2.6rem;
+  will-change: transform, opacity;
+}
+
+/* Individual input field */
+.contact-new__field {
+  position: relative;
+  padding-top: 1.3rem;
+}
+
+.contact-new__label {
+  position: absolute;
+  top: 1.35rem;
+  left: 0;
+  font-size: 0.88rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.36);
+  pointer-events: none;
+  transform-origin: left center;
+  will-change: transform;
+  letter-spacing: 0.02em;
+}
+
+.contact-new__input,
+.contact-new__textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.13);
+  padding: 0.5rem 0;
+  font-family: 'Sora', ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.96rem;
+  color: rgba(255, 255, 255, 0.88);
+  outline: none;
+  cursor: text;
+  transition: border-color 0.32s ease;
+  caret-color: rgb(var(--oksap-silver));
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+  line-height: 1.5;
+}
+
+.contact-new__input:focus,
+.contact-new__textarea:focus {
+  border-color: transparent; /* field-line handles focused underline */
+}
+
+.contact-new__textarea {
+  resize: none;
+  line-height: 1.7;
+  min-height: 5.5rem;
+  overflow-y: hidden;
+}
+
+/* Animated expanding underline */
+.contact-new__field-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  width: 0;
+  background: linear-gradient(90deg, rgb(var(--oksap-silver) / 0.75), rgb(var(--oksap-accent) / 0.55));
+  transition: width 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.contact-new__input:focus ~ .contact-new__field-line,
+.contact-new__textarea:focus ~ .contact-new__field-line {
+  width: 100%;
+}
+
+/* ── Submit area ── */
+.contact-new__submit-area {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-top: 0.4rem;
+}
+
+/* Zone enlarges magnetic hit area */
+.contact-new__submit-magnetic {
+  padding: 1.75rem;
+  cursor: none;
+}
+
+.contact-new__submit {
+  position: relative;
+  width: 7.4rem;
+  height: 7.4rem;
+  border-radius: 50%;
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.18rem;
+  cursor: none;
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.78);
+  will-change: transform;
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    color 0.2s ease;
+}
+
+/* Liquid fill pseudo */
+.contact-new__submit::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    rgb(var(--oksap-silver) / 0.22) 0%,
+    rgb(var(--oksap-accent) / 0.16) 70%,
+    transparent 100%
+  );
+  transform: scale(0);
+  transition: transform 0.58s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: center;
+}
+
+.contact-new__submit:hover::before {
+  transform: scale(1.1);
+}
+
+.contact-new__submit:hover {
+  border-color: rgb(var(--oksap-silver) / 0.52);
+  box-shadow: 0 0 36px rgb(var(--oksap-silver) / 0.1);
+  color: rgb(var(--oksap-silver));
+}
+
+.contact-new__submit-label {
+  position: relative;
+  z-index: 1;
+  font-family: 'Sora', ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.contact-new__submit-arrow {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+  transition: transform 0.3s ease;
+}
+
+.contact-new__submit:hover .contact-new__submit-arrow {
+  transform: translate(2px, -2px);
+}
+
+/* ── Success state ── */
+.contact-new__success {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1rem;
+  opacity: 0;
+  pointer-events: none;
+  text-align: center;
+}
+
+.contact-new__success.is-visible {
+  pointer-events: auto;
+}
+
+.contact-new__success-check {
+  position: relative;
+  color: rgb(var(--oksap-silver) / 0.88);
+}
+
+.contact-new__success-title {
+  font-family: 'Sora', ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.6rem, 4vw, 2.5rem);
+  font-weight: 700;
+  color: rgb(var(--oksap-navy));
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.contact-new__success-sub {
+  font-size: 0.86rem;
+  color: rgb(var(--oksap-silver) / 0.65);
+  max-width: 20rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Scatter particles */
+.contact-new__particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgb(var(--oksap-silver) / 0.75);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1023px) {
+  .contact-new {
+    padding: 4.5rem 0 4rem;
+  }
+
+  .contact-new__headline-inner {
+    font-size: clamp(2.4rem, 10vw, 3.6rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .contact-new {
+    padding: 3.5rem 0 3.5rem;
+  }
+
+  .contact-new__submit-area {
+    justify-content: center;
+  }
+
+  .contact-new__submit-magnetic {
+    padding: 1.25rem;
+  }
+
+  .contact-new__submit {
+    width: 6.4rem;
+    height: 6.4rem;
+  }
+}

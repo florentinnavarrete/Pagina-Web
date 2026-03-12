@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Linkedin, Instagram, Twitter, Mail, Globe, Menu, X } from 'lucide-react';
-import { SiTiktok } from 'react-icons/si';
+import { Menu, X } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -10,10 +9,17 @@ import CreativeSection from './components/CreativeSection';
 import Portfolio from './components/Portfolio';
 import Services from './components/Services';
 import BackgroundAtmosphere from './components/BackgroundAtmosphere';
+import Team from './components/Team';
+import Contact from './components/Contact';
 import useSmoothScroll from './hooks/useSmoothScroll';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 ScrollTrigger.config({ limitCallbacks: true, ignoreMobileResize: true });
+ScrollTrigger.defaults({
+  preventOverlaps: true,
+  fastScrollEnd: true,
+  invalidateOnRefresh: true,
+});
 
 type Locale = 'es' | 'en';
 
@@ -24,7 +30,6 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Inicio', type: 'anchor', target: 'home' },
   { label: 'AI Videos', type: 'static' },
   { label: 'Blog', type: 'external', target: COMPANY_INFO.blog },
   { label: 'About Us', type: 'static' },
@@ -43,7 +48,6 @@ const App: React.FC = () => {
 
   const lenisRef = useSmoothScroll();
 
-  const [orbitStep, setOrbitStep] = useState(0);
   const [locale, setLocale] = useState<Locale>('es');
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -51,12 +55,26 @@ const App: React.FC = () => {
     setMenuOpen(false);
     const section = document.getElementById(id);
     if (section) {
+      // Recalcula triggers antes del salto para evitar desajustes.
+      ScrollTrigger.refresh();
+
       if (lenisRef.current) {
-        lenisRef.current.scrollTo(section, { offset: -24 });
+        lenisRef.current.scrollTo(`#${id}`, {
+          offset: -24,
+          duration: 1,
+          immediate: false,
+          lock: true,
+          onComplete: () => {
+            requestAnimationFrame(() => ScrollTrigger.refresh());
+          },
+        });
+
+        window.setTimeout(() => ScrollTrigger.refresh(), 420);
         return;
       }
 
       section.scrollIntoView({ behavior: 'auto', block: 'start' });
+      window.setTimeout(() => ScrollTrigger.refresh(), 420);
     }
   };
 
@@ -74,36 +92,6 @@ const App: React.FC = () => {
   const interstitialText = locale === 'es'
     ? 'Especialistas en soluciones SAP HR con experiencia senior en requisitos legales españoles. SuccessFactors, SAP HCM, Nómina Española.'
     : 'SAP HR solution specialists with senior experience in Spanish legal requirements. SuccessFactors, SAP HCM, Spanish Payroll.';
-
-  const contactCopy = locale === 'es'
-    ? {
-      description: 'Ya sea para planificar crecimiento, explorar nuevas oportunidades o impulsar tu operación de SAP HR, nuestro equipo está listo para ayudarte.',
-      sectionTitle: 'Conecta con nosotros',
-      subtitle: 'Síguenos en nuestras redes sociales y contáctanos para conocer cómo podemos ayudarte.',
-      website: 'Web',
-      address: 'Dirección',
-      connect: 'Conecta',
-    }
-    : {
-      description: 'Whether you are planning growth, exploring new opportunities, or scaling your SAP HR operations, our team is ready to help.',
-      sectionTitle: 'Get in Touch',
-      subtitle: 'Follow us on social media and reach out to learn how we can help you.',
-      website: 'Website',
-      address: 'Address',
-      connect: 'Connect',
-    };
-
-  const orbitIconItems: Array<{ id: string; label: string; Icon: React.ComponentType<{ size?: number; className?: string }> }> = [
-    { id: 'linkedin', label: 'LinkedIn', Icon: Linkedin },
-    { id: 'instagram', label: 'Instagram', Icon: Instagram },
-    { id: 'twitter', label: 'X', Icon: Twitter },
-    { id: 'tiktok', label: 'TikTok', Icon: SiTiktok },
-    { id: 'email', label: 'Email', Icon: Mail },
-    { id: 'web', label: locale === 'es' ? 'Web' : 'Website', Icon: Globe }
-  ];
-  const orbitPositions = ['top', 'left', 'right'] as const;
-  const activeOrbitCircleIndex = orbitStep % orbitPositions.length;
-  const activeOrbitItem = orbitIconItems[orbitStep % orbitIconItems.length];
 
   const purposeContent = locale === 'es'
     ? {
@@ -247,7 +235,11 @@ const App: React.FC = () => {
         };
       }
     },
-    { scope: heroSectionRef },
+    {
+      scope: heroSectionRef,
+      dependencies: [locale],
+      revertOnUpdate: true,
+    },
   );
 
   useEffect(() => {
@@ -293,17 +285,23 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      setOrbitStep((previous) => (previous + 1) % 6);
-    }, 2300);
+    const handleLoadRefresh = () => ScrollTrigger.refresh();
+    const delayedRefresh = window.setTimeout(() => ScrollTrigger.refresh(), 220);
+
+    if (document.readyState === 'complete') {
+      ScrollTrigger.refresh();
+    } else {
+      window.addEventListener('load', handleLoadRefresh, { once: true });
+    }
 
     return () => {
-      window.clearInterval(intervalId);
+      window.removeEventListener('load', handleLoadRefresh);
+      window.clearTimeout(delayedRefresh);
     };
   }, []);
 
   return (
-    <div className="min-h-screen bg-transparent font-sans relative overflow-x-clip" style={{ cursor: 'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSI2IiBzdHJva2U9IiNDQkVFRjMiIHN0cm9rZS13aWR0aD0iMS41IiBmaWxsPSJub25lIi8+PC9zdmc+) 12 12, auto' }}>
+    <div className="min-h-screen bg-transparent font-sans relative isolate overflow-x-clip" style={{ cursor: 'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSI2IiBzdHJva2U9IiNDQkVFRjMiIHN0cm9rZS13aWR0aD0iMS41IiBmaWxsPSJub25lIi8+PC9zdmc+) 12 12, auto' }}>
       <BackgroundAtmosphere />
       <img
         ref={heroLogoOverlayRef}
@@ -485,87 +483,9 @@ const App: React.FC = () => {
 
         <Portfolio />
 
-        <section id="contact" className="contact-section-center relative px-3 sm:px-4 lg:px-6 bg-oksap-background/40 nfc-parallax">
-          <div className="max-w-[1680px] mx-auto w-full">
-            <div className="text-center mb-8 sm:mb-10 lg:mb-12">
-              <h2 className="font-hero text-4xl sm:text-5xl lg:text-6xl font-semibold text-oksap-navy mb-4 tracking-[0.01em]">
-                {contactCopy.sectionTitle}
-              </h2>
-            </div>
+        <Team />
 
-            <div className="contact-showcase-grid max-w-6xl mx-auto">
-              <div className="contact-showcase-copy">
-                <p className="contact-showcase-description">
-                  {contactCopy.description}
-                </p>
-
-                <div className="contact-showcase-line">
-                  <span className="contact-showcase-line-label">Email</span>
-                  <a href={`mailto:${COMPANY_INFO.email}`} className="contact-showcase-line-value">{COMPANY_INFO.email}</a>
-                </div>
-
-                <div className="contact-showcase-line">
-                  <span className="contact-showcase-line-label">{contactCopy.website}</span>
-                  <a href={COMPANY_INFO.website} target="_blank" rel="noopener noreferrer" className="contact-showcase-line-value">
-                    {COMPANY_INFO.website}
-                  </a>
-                </div>
-
-                <div className="contact-showcase-line">
-                  <span className="contact-showcase-line-label">{contactCopy.address}</span>
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(COMPANY_INFO.address)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="contact-showcase-line-value"
-                  >
-                    {COMPANY_INFO.address}
-                  </a>
-                </div>
-
-                <div className="contact-showcase-line">
-                  <span className="contact-showcase-line-label">{contactCopy.connect}</span>
-                  <div className="contact-showcase-socials">
-                    {COMPANY_INFO.socials.map((social) => (
-                      <a
-                        key={social.id}
-                        href={social.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="contact-showcase-social-link"
-                      >
-                        {social.id === 'x' ? 'X' : social.name}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="contact-orbit" aria-hidden="true">
-                {orbitPositions.map((position, index) => {
-                  const isActiveCircle = index === activeOrbitCircleIndex;
-                  const ActiveIcon = activeOrbitItem.Icon;
-
-                  return (
-                    <div key={position} className={`contact-orbit-circle contact-orbit-circle--${position}`}>
-                      {isActiveCircle ? (
-                        <span key={`${position}-${activeOrbitItem.id}-${orbitStep}`} className="contact-orbit-rotating-icon" aria-hidden="true">
-                          <ActiveIcon size={40} />
-                        </span>
-                      ) : null}
-                      <span className="sr-only">{activeOrbitItem.label}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <p className="contact-showcase-subtitle text-base sm:text-xl text-oksap-silver max-w-2xl mt-6 sm:mt-8 mx-auto text-center sm:text-left">
-              {contactCopy.subtitle}
-            </p>
-          </div>
-        </section>
-
+        <Contact locale={locale} />
 
       </main>
 

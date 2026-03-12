@@ -1,204 +1,427 @@
 
-import React, { useState } from 'react';
-import { Mail, MapPin, Send, CheckCircle } from 'lucide-react';
-import { Icons } from './Icons';
+import React, { useRef, useState, useEffect } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import {
+  MapPin,
+  ArrowUpRight,
+  CheckCircle,
+  Linkedin,
+  Instagram,
+  Twitter,
+} from 'lucide-react';
 import { COMPANY_INFO } from '../constants';
+import './Contact.css';
 
-const Contact: React.FC = () => {
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
-  const [submitted, setSubmitted] = useState(false);
+type Locale = 'es' | 'en';
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
+interface ContactProps {
+  locale: Locale;
+}
+
+// ── Floating-label field ──────────────────────────────────────────────────────
+interface FieldProps {
+  id: string;
+  label: string;
+  type?: string;
+  multiline?: boolean;
+  required?: boolean;
+}
+
+const Field: React.FC<FieldProps> = ({
+  id,
+  label,
+  type = 'text',
+  multiline,
+  required,
+}) => {
+  const labelRef = useRef<HTMLLabelElement>(null);
+
+  const floatUp = () => {
+    if (!labelRef.current) return;
+    gsap.to(labelRef.current, {
+      y: -22,
+      scale: 0.74,
+      color: 'rgba(203, 238, 243, 0.72)',
+      duration: 0.28,
+      ease: 'power2.out',
+      transformOrigin: 'left center',
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Form submitted:', formData);
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({ name: '', email: '', message: '' });
-    }, 3000);
+  const floatDown = (value: string) => {
+    if (!labelRef.current || value) return;
+    gsap.to(labelRef.current, {
+      y: 0,
+      scale: 1,
+      color: 'rgba(255, 255, 255, 0.36)',
+      duration: 0.28,
+      ease: 'power2.out',
+      transformOrigin: 'left center',
+    });
   };
 
   return (
-    <section id="contact" className="py-24 px-4 bg-oksap-light section-shell relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-oksap-silver/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-oksap-dark/10 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-oksap-navy/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-      </div>
+    <div className="contact-new__field contact-new__form-field">
+      {multiline ? (
+        <textarea
+          id={id}
+          name={id}
+          required={required}
+          rows={4}
+          className="contact-new__textarea"
+          onFocus={floatUp}
+          onBlur={(e) => floatDown(e.target.value)}
+        />
+      ) : (
+        <input
+          id={id}
+          name={id}
+          type={type}
+          required={required}
+          className="contact-new__input"
+          onFocus={floatUp}
+          onBlur={(e) => floatDown(e.target.value)}
+          autoComplete="off"
+        />
+      )}
+      <label ref={labelRef} htmlFor={id} className="contact-new__label">
+        {label}
+      </label>
+      <div className="contact-new__field-line" aria-hidden="true" />
+    </div>
+  );
+};
 
-      <div className="max-w-7xl mx-auto relative z-10">
-        {/* Section Header */}
-        <div className="mb-14 md:mb-16 max-w-3xl">
-          <p className="text-xs uppercase tracking-[0.18em] text-oksap-silver font-bold mb-3">Contacto</p>
-          <h2 className="text-4xl md:text-5xl font-bold text-oksap-navy mb-4 leading-tight">
-            Contáctanos
-          </h2>
-          <div className="w-24 h-1 bg-oksap-silver mb-5 rounded-full"></div>
-          <p className="text-oksap-accent text-lg max-w-2xl">
-            Estamos disponibles para escuchar sobre nuevas oportunidades y proyectos de consultoría
-          </p>
-        </div>
+// ── Contact Section ───────────────────────────────────────────────────────────
+const Contact: React.FC<ContactProps> = ({ locale }) => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const successRef = useRef<HTMLDivElement>(null);
+  const magneticZoneRef = useRef<HTMLDivElement>(null);
+  const submitBtnRef = useRef<HTMLButtonElement>(null);
+  const particlesRef = useRef<(HTMLSpanElement | null)[]>([]);
+  const [submitted, setSubmitted] = useState(false);
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Contact Info */}
-          <div className="space-y-6">
-            {/* Email */}
-            <div className="bg-oksap-primary/15 rounded-xl p-8 shadow-md border border-oksap-navy/20 hover:border-oksap-silver/60 hover:shadow-lg transition-all border-t-4 border-t-oksap-silver ignite-hover">
-              <div className="w-14 h-14 rounded-lg bg-oksap-silver/20 flex items-center justify-center mb-4">
-                <Mail className="text-oksap-navy" size={28} />
-              </div>
-              <h3 className="text-lg font-bold text-oksap-navy mb-2">Email</h3>
-              <a
-                href={`mailto:${COMPANY_INFO.email}`}
-                className="text-oksap-accent hover:text-oksap-navy transition-colors break-all font-medium"
-              >
-                {COMPANY_INFO.email}
-              </a>
+  const headlines =
+    locale === 'es'
+      ? ['Ready to', 'scale tu', 'SAP HR?']
+      : ['Ready to', 'scale your', 'SAP HR?'];
+
+  const fields =
+    locale === 'es'
+      ? [
+          { id: 'name', label: 'Tu nombre', type: 'text', required: true },
+          { id: 'email', label: 'Email de empresa', type: 'email', required: true },
+          { id: 'message', label: 'Cuéntanos tu proyecto', multiline: true, required: true },
+        ]
+      : [
+          { id: 'name', label: 'Your name', type: 'text', required: true },
+          { id: 'email', label: 'Company email', type: 'email', required: true },
+          { id: 'message', label: 'Tell us about your project', multiline: true, required: true },
+        ];
+
+  const btnLabel = locale === 'es' ? 'Enviar' : 'Send';
+  const successTitle = locale === 'es' ? '¡Mensaje enviado!' : 'Message sent!';
+  const successSub =
+    locale === 'es'
+      ? 'Nos pondremos en contacto contigo muy pronto.'
+      : "We'll get back to you very soon.";
+
+  // ── Scroll-triggered reveal ──
+  useGSAP(
+    () => {
+      gsap.from('.contact-new__headline-inner', {
+        y: '106%',
+        duration: 1.05,
+        ease: 'power4.out',
+        stagger: 0.09,
+        scrollTrigger: {
+          trigger: '.contact-new__headline-wrap',
+          start: 'top 84%',
+          toggleActions: 'play none none none',
+          invalidateOnRefresh: true,
+        },
+      });
+
+      gsap.from('.contact-new__info-row', {
+        y: 20,
+        opacity: 0,
+        duration: 0.65,
+        ease: 'power3.out',
+        stagger: 0.07,
+        scrollTrigger: {
+          trigger: '.contact-new__info',
+          start: 'top 86%',
+          toggleActions: 'play none none none',
+          invalidateOnRefresh: true,
+        },
+      });
+
+      gsap.from('.contact-new__form-field', {
+        y: 36,
+        opacity: 0,
+        duration: 0.72,
+        ease: 'power3.out',
+        stagger: 0.09,
+        scrollTrigger: {
+          trigger: '.contact-new__form',
+          start: 'top 82%',
+          toggleActions: 'play none none none',
+          invalidateOnRefresh: true,
+        },
+      });
+
+      gsap.from('.contact-new__submit-magnetic', {
+        scale: 0.66,
+        opacity: 0,
+        duration: 0.84,
+        ease: 'back.out(1.7)',
+        scrollTrigger: {
+          trigger: '.contact-new__submit-area',
+          start: 'top 92%',
+          toggleActions: 'play none none none',
+          invalidateOnRefresh: true,
+        },
+      });
+    },
+    { scope: sectionRef },
+  );
+
+  // ── Magnetic button ──
+  useEffect(() => {
+    const zone = magneticZoneRef.current;
+    const btn = submitBtnRef.current;
+    if (!zone || !btn) return;
+
+    const onMove = (e: MouseEvent) => {
+      const rect = zone.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      gsap.to(btn, {
+        x: (e.clientX - cx) * 0.46,
+        y: (e.clientY - cy) * 0.46,
+        duration: 0.27,
+        ease: 'power2.out',
+        overwrite: 'auto',
+      });
+    };
+
+    const onLeave = () => {
+      gsap.to(btn, {
+        x: 0,
+        y: 0,
+        duration: 0.72,
+        ease: 'elastic.out(1, 0.45)',
+        overwrite: 'auto',
+      });
+    };
+
+    zone.addEventListener('mousemove', onMove);
+    zone.addEventListener('mouseleave', onLeave);
+    return () => {
+      zone.removeEventListener('mousemove', onMove);
+      zone.removeEventListener('mouseleave', onLeave);
+    };
+  }, []);
+
+  // ── Form submission ──
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (submitted) return;
+
+    const form = formRef.current;
+    const success = successRef.current;
+    const particles = particlesRef.current.filter(
+      (p): p is HTMLSpanElement => p !== null,
+    );
+    if (!form || !success) return;
+
+    const tl = gsap.timeline();
+
+    tl.to(form, { y: -40, opacity: 0, duration: 0.48, ease: 'power3.in' });
+
+    tl.fromTo(
+      particles,
+      { scale: 0, opacity: 1, x: 0, y: 0 },
+      {
+        scale: 1,
+        opacity: 0,
+        x: (_i: number) => Math.cos((_i * 2 * Math.PI) / 8) * 68,
+        y: (_i: number) => Math.sin((_i * 2 * Math.PI) / 8) * 68,
+        duration: 0.88,
+        ease: 'power2.out',
+        stagger: 0.04,
+      },
+      '-=0.1',
+    );
+
+    tl.fromTo(
+      success,
+      { scale: 0.7, opacity: 0, y: 24 },
+      {
+        scale: 1,
+        opacity: 1,
+        y: 0,
+        duration: 0.84,
+        ease: 'back.out(1.7)',
+        onStart: () => {
+          setSubmitted(true);
+          success.classList.add('is-visible');
+        },
+      },
+      '-=0.46',
+    );
+  };
+
+  return (
+    <section
+      id="contact"
+      ref={sectionRef}
+      className="contact-new relative px-3 sm:px-4 lg:px-6"
+    >
+      <div
+        className="absolute top-0 left-0 right-0 h-px"
+        style={{
+          background:
+            'linear-gradient(90deg, transparent 0%, rgba(203,238,243,0.1) 40%, rgba(245,167,203,0.1) 60%, transparent 100%)',
+        }}
+        aria-hidden="true"
+      />
+
+      <div className="max-w-[1680px] mx-auto w-full">
+        <div className="contact-new__grid">
+          {/* ── Left ── */}
+          <div className="contact-new__left">
+            <p className="contact-new__eyebrow">
+              {locale === 'es' ? 'Hablemos' : 'Get in touch'}
+            </p>
+
+            <div className="contact-new__headline-wrap" aria-label={headlines.join(' ')}>
+              {headlines.map((line, i) => (
+                <span key={i} className="contact-new__headline-line">
+                  <span
+                    className={`contact-new__headline-inner${
+                      i === headlines.length - 1
+                        ? ' contact-new__headline-inner--accent'
+                        : ''
+                    }`}
+                    aria-hidden="true"
+                  >
+                    {line}
+                  </span>
+                </span>
+              ))}
             </div>
 
-            {/* Location */}
-            <div className="bg-oksap-primary/15 rounded-xl p-8 shadow-md border border-oksap-navy/20 hover:border-oksap-silver/60 hover:shadow-lg transition-all border-t-4 border-t-oksap-silver ignite-hover">
-              <div className="w-14 h-14 rounded-lg bg-oksap-silver/20 flex items-center justify-center mb-4">
-                <MapPin className="text-oksap-navy" size={28} />
+            <div className="contact-new__info">
+              <div className="contact-new__info-row">
+                <MapPin
+                  size={12}
+                  className="shrink-0"
+                  style={{ color: 'rgba(203,238,243,0.42)' }}
+                  aria-hidden="true"
+                />
+                <span className="contact-new__info-label">
+                  {locale === 'es' ? 'Sede' : 'Office'}
+                </span>
+                <span className="contact-new__info-value">{COMPANY_INFO.address}</span>
               </div>
-              <h3 className="text-lg font-bold text-oksap-navy mb-2">Ubicación</h3>
-              <p className="text-oksap-accent">{COMPANY_INFO.address}</p>
+
+              <div className="contact-new__info-row">
+                <span className="contact-new__info-label">Email</span>
+                <a href={`mailto:${COMPANY_INFO.email}`} className="contact-new__info-value">
+                  {COMPANY_INFO.email}
+                </a>
+              </div>
+
+              <div className="contact-new__info-row contact-new__socials-row">
+                {COMPANY_INFO.socials.map((social) => {
+                  const Icon =
+                    social.id === 'linkedin'
+                      ? Linkedin
+                      : social.id === 'instagram'
+                        ? Instagram
+                        : social.id === 'x'
+                          ? Twitter
+                          : null;
+                  return (
+                    <a
+                      key={social.id}
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="contact-new__social-link"
+                    >
+                      {Icon && <Icon size={10} strokeWidth={2} aria-hidden="true" />}
+                      {social.id === 'x' ? 'X / Twitter' : social.name}
+                      <ArrowUpRight size={9} aria-hidden="true" />
+                    </a>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          {/* Contact Form */}
-          <form onSubmit={handleSubmit} className="lg:col-span-2 bg-oksap-primary/15 rounded-xl p-8 shadow-md border border-oksap-navy/20 border-t-4 border-t-oksap-silver">
-            {submitted && (
-              <div className="mb-6 p-4 bg-oksap-silver/10 border border-oksap-navy rounded-lg flex items-center gap-3">
-                <CheckCircle className="text-oksap-navy" size={24} />
-                <p className="text-oksap-navy font-medium">¡Mensaje enviado correctamente! Te contactaremos pronto.</p>
-              </div>
-            )}
-
-            <div className="space-y-6">
-              {/* Name Input */}
-              <div>
-                <label className="block text-sm font-bold text-oksap-navy mb-2">Nombre</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-oksap-primary/30 bg-oksap-light focus:border-oksap-navy focus:outline-none focus:ring-2 focus:ring-oksap-silver/30 transition-all"
-                  placeholder="Tu nombre"
-                  style={{ color: 'var(--oksap-accent-hex)' }}
-                />
-              </div>
-
-              {/* Email Input */}
-              <div>
-                <label className="block text-sm font-bold text-oksap-navy mb-2">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-oksap-primary/30 bg-oksap-light focus:border-oksap-navy focus:outline-none focus:ring-2 focus:ring-oksap-silver/30 transition-all"
-                  placeholder="tu@email.com"
-                  style={{ color: 'var(--oksap-accent-hex)' }}
-                />
-              </div>
-
-              {/* Message Input */}
-              <div>
-                <label className="block text-sm font-bold text-oksap-navy mb-2">Mensaje</label>
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  required
-                  rows={5}
-                  className="w-full px-4 py-3 rounded-lg border border-oksap-primary/30 bg-oksap-light focus:border-oksap-navy focus:outline-none focus:ring-2 focus:ring-oksap-silver/30 transition-all resize-none"
-                  placeholder="Tu mensaje aquí..."
-                  style={{ color: 'var(--oksap-accent-hex)' }}
-                />
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className="w-full px-8 py-4 bg-oksap-silver text-black rounded-full font-bold hover:shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2"
+          {/* ── Right: Form ── */}
+          <div className="contact-new__right">
+            <div className="contact-new__form-area">
+              <form
+                ref={formRef}
+                className="contact-new__form"
+                onSubmit={handleSubmit}
+                noValidate
               >
-                <Send size={20} />
-                Enviar Mensaje
-              </button>
+                {fields.map((f) => (
+                  <Field
+                    key={f.id}
+                    id={f.id}
+                    label={f.label}
+                    type={f.type}
+                    multiline={f.multiline}
+                    required={f.required}
+                  />
+                ))}
 
-              {/* Social Media Links */}
-              <div className="pt-4 border-t border-oksap-primary/30">
-                <p className="text-sm font-bold text-oksap-navy mb-4 text-center">O conéctate con nosotros en:</p>
-                <div className="grid grid-cols-5 gap-3">
-                  {/* Website */}
-                  <a
-                    href={COMPANY_INFO.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center p-3 rounded-lg bg-oksap-navy text-white hover:shadow-lg hover:-translate-y-1 transition-all flame-glow-hover"
-                    title="Sitio Web"
-                  >
-                    <Icons.Globe size={20} />
-                  </a>
-
-                  {/* LinkedIn */}
-                  <a
-                    href={COMPANY_INFO.socials.find((s: any) => s.id === 'linkedin')?.url || '#'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center p-3 rounded-lg bg-[#0A66C2] text-white hover:shadow-lg hover:-translate-y-1 transition-all flame-glow-hover"
-                    title="LinkedIn"
-                  >
-                    <Icons.Linkedin size={20} />
-                  </a>
-
-                  {/* Instagram */}
-                  <a
-                    href={COMPANY_INFO.socials.find((s: any) => s.id === 'instagram')?.url || '#'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center p-3 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 text-white hover:shadow-lg hover:-translate-y-1 transition-all"
-                    title="Instagram"
-                  >
-                    <Icons.Instagram size={20} />
-                  </a>
-
-                  {/* TikTok */}
-                  <a
-                    href={COMPANY_INFO.socials.find((s: any) => s.id === 'tiktok')?.url || '#'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center p-3 rounded-lg bg-gradient-to-br from-black to-pink-500 text-white hover:shadow-lg hover:-translate-y-1 transition-all"
-                    title="TikTok"
-                  >
-                    <Icons.TikTok size={20} />
-                  </a>
-
-                  {/* X (Twitter) */}
-                  <a
-                    href={COMPANY_INFO.socials.find((s: any) => s.id === 'x')?.url || '#'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center p-3 rounded-lg bg-gradient-to-br from-gray-900 to-black text-white hover:shadow-lg hover:-translate-y-1 transition-all"
-                    title="X"
-                  >
-                    <Icons.XIcon size={20} />
-                  </a>
+                <div className="contact-new__submit-area">
+                  <div ref={magneticZoneRef} className="contact-new__submit-magnetic">
+                    <button
+                      ref={submitBtnRef}
+                      type="submit"
+                      className="contact-new__submit"
+                      aria-label={btnLabel}
+                    >
+                      <span className="contact-new__submit-label">{btnLabel}</span>
+                      <ArrowUpRight
+                        size={15}
+                        strokeWidth={1.5}
+                        className="contact-new__submit-arrow"
+                        aria-hidden="true"
+                      />
+                    </button>
+                  </div>
                 </div>
+              </form>
+
+              <div
+                ref={successRef}
+                className="contact-new__success"
+                aria-live="polite"
+              >
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <span
+                    key={i}
+                    ref={(el) => { particlesRef.current[i] = el; }}
+                    className="contact-new__particle"
+                    aria-hidden="true"
+                  />
+                ))}
+                <CheckCircle size={44} strokeWidth={1.2} className="contact-new__success-check" aria-hidden="true" />
+                <p className="contact-new__success-title">{successTitle}</p>
+                <p className="contact-new__success-sub">{successSub}</p>
               </div>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </section>

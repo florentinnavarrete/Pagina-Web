@@ -9,7 +9,7 @@ html,
 body,
 #root {
   width: 100%;
-  background-color: var(--oksap-background-hex);
+  background-color: transparent;
   color: var(--oksap-navy-hex);
   overflow-x: clip;
 }
@@ -80,7 +80,7 @@ html.lenis body {
 .background-atmosphere {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   pointer-events: none;
   overflow: hidden;
 }
@@ -89,35 +89,35 @@ html.lenis body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(120% 95% at 50% 8%, rgb(18 24 44 / 0.66) 0%, transparent 62%),
-    linear-gradient(180deg, rgb(6 8 15 / 0.98) 0%, rgb(9 13 26 / 0.985) 45%, rgb(7 10 20 / 0.99) 100%);
+    radial-gradient(120% 95% at 50% 8%, rgb(24 32 62 / 0.78) 0%, transparent 62%),
+    linear-gradient(180deg, rgb(5 6 14 / 0.98) 0%, rgb(9 12 28 / 0.985) 45%, rgb(7 10 20 / 0.99) 100%);
 }
 
 .background-atmosphere__blob {
   position: absolute;
   border-radius: 9999px;
   filter: blur(80px);
-  opacity: 0.28;
+  opacity: 0.52;
   transform: translate3d(0, 0, 0) scale(1);
   will-change: transform, opacity;
   mix-blend-mode: screen;
 }
 
 .background-atmosphere__blob--pink {
-  width: min(46vw, 680px);
-  height: min(46vw, 680px);
-  left: -8vw;
-  top: 8vh;
-  background: radial-gradient(circle at 35% 35%, rgb(var(--oksap-accent) / 0.7) 0%, rgb(var(--oksap-accent) / 0.22) 48%, transparent 72%);
+  width: min(52vw, 760px);
+  height: min(52vw, 760px);
+  left: -10vw;
+  top: 6vh;
+  background: radial-gradient(circle at 35% 35%, rgb(var(--oksap-accent) / 0.92) 0%, rgb(var(--oksap-accent) / 0.46) 48%, transparent 74%);
   animation: mesh-float-pink 20s ease-in-out infinite;
 }
 
 .background-atmosphere__blob--blue {
-  width: min(52vw, 760px);
-  height: min(52vw, 760px);
+  width: min(58vw, 860px);
+  height: min(58vw, 860px);
   right: -12vw;
-  top: 22vh;
-  background: radial-gradient(circle at 45% 45%, rgb(var(--oksap-silver) / 0.72) 0%, rgb(var(--oksap-silver) / 0.24) 52%, transparent 74%);
+  top: 18vh;
+  background: radial-gradient(circle at 45% 45%, rgb(var(--oksap-silver) / 0.95) 0%, rgb(var(--oksap-silver) / 0.48) 52%, transparent 76%);
   animation: mesh-float-blue 24s ease-in-out infinite;
 }
 
@@ -127,7 +127,7 @@ html.lenis body {
   left: 28vw;
   bottom: -14vh;
   background: radial-gradient(circle at 50% 40%, rgb(124 108 255 / 0.34) 0%, rgb(var(--oksap-accent) / 0.18) 46%, transparent 74%);
-  opacity: 0.2;
+  opacity: 0.34;
   animation: mesh-float-violet 22s ease-in-out infinite;
 }
 
@@ -143,15 +143,15 @@ html.lenis body {
   0%,
   100% {
     transform: translate3d(0, 0, 0) scale(1);
-    opacity: 0.24;
+    opacity: 0.36;
   }
   35% {
     transform: translate3d(9vw, -4vh, 0) scale(1.08);
-    opacity: 0.32;
+    opacity: 0.52;
   }
   68% {
     transform: translate3d(3vw, 6vh, 0) scale(0.94);
-    opacity: 0.22;
+    opacity: 0.34;
   }
 }
 
@@ -159,15 +159,15 @@ html.lenis body {
   0%,
   100% {
     transform: translate3d(0, 0, 0) scale(1);
-    opacity: 0.3;
+    opacity: 0.42;
   }
   40% {
     transform: translate3d(-10vw, 4vh, 0) scale(1.1);
-    opacity: 0.2;
+    opacity: 0.3;
   }
   75% {
     transform: translate3d(-4vw, -5vh, 0) scale(0.95);
-    opacity: 0.3;
+    opacity: 0.44;
   }
 }
 
@@ -353,6 +353,44 @@ html.lenis body {
 
 .horizontal-mobile-scroll::-webkit-scrollbar {
   display: none;
+}
+
+/* Hover estable para carruseles de logos (sin flicker de color). */
+.clients-logo-card {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.clients-logo-image {
+  transition: filter 0.3s ease, opacity 0.3s ease;
+  filter: grayscale(100%) saturate(1) brightness(1);
+}
+
+.clients-logo-glow {
+  transition: opacity 0.3s ease;
+}
+
+.clients-marquee-track.clients-track-hover .clients-logo-card {
+  opacity: 0.5;
+  transform: scale(0.985);
+}
+
+.clients-marquee-track.clients-track-hover .clients-logo-card .clients-logo-image {
+  filter: grayscale(100%) saturate(0.85) brightness(0.82);
+  opacity: 0.42;
+}
+
+.clients-marquee-track.clients-track-hover .clients-logo-card.is-active {
+  opacity: 1;
+  transform: scale(1.04);
+}
+
+.clients-marquee-track.clients-track-hover .clients-logo-card.is-active .clients-logo-image {
+  opacity: 1;
+  filter: brightness(0) saturate(100%) invert(84%) sepia(28%) saturate(770%) hue-rotate(159deg) brightness(105%) contrast(98%);
+}
+
+.clients-marquee-track.clients-track-hover .clients-logo-card.is-active .clients-logo-glow {
+  opacity: 0.56;
 }
 
 @media (max-width: 768px) {

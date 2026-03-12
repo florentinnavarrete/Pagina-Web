@@ -2,7 +2,7 @@ import React from 'react';
 
 const BackgroundAtmosphere: React.FC = () => {
   return (
-    <div className="background-atmosphere" aria-hidden="true">
+    <div className="background-atmosphere" aria-hidden="true" style={{ pointerEvents: 'none' }}>
       {/* Base oscura para crear una atmósfera inmersiva tipo Tiwis */}
       <div className="background-atmosphere__base" />
 

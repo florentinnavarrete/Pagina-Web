@@ -89,11 +89,47 @@ const Portfolio: React.FC = () => {
       marquee2.addEventListener('pointerenter', pause2);
       marquee2.addEventListener('pointerleave', play2);
 
+      // Hover limpio sin flicker: sólo clases CSS, sin tweens de color en GSAP.
+      const hoverListeners: Array<{ card: HTMLElement; enter: () => void; leave: () => void }> = [];
+
+      const wireCarouselHover = (marquee: HTMLDivElement) => {
+        const cards = Array.from(marquee.querySelectorAll<HTMLElement>('.clients-logo-card'));
+
+        cards.forEach((card) => {
+          const enter = () => {
+            marquee.classList.add('clients-track-hover');
+            cards.forEach((c) => c.classList.remove('is-active'));
+            card.classList.add('is-active');
+          };
+
+          const leave = () => {
+            card.classList.remove('is-active');
+            if (!marquee.querySelector('.clients-logo-card.is-active')) {
+              marquee.classList.remove('clients-track-hover');
+            }
+          };
+
+          card.addEventListener('pointerenter', enter);
+          card.addEventListener('pointerleave', leave);
+          hoverListeners.push({ card, enter, leave });
+        });
+      };
+
+      wireCarouselHover(marquee1);
+      wireCarouselHover(marquee2);
+
       return () => {
         marquee1.removeEventListener('pointerenter', pause1);
         marquee1.removeEventListener('pointerleave', play1);
         marquee2.removeEventListener('pointerenter', pause2);
         marquee2.removeEventListener('pointerleave', play2);
+        marquee1.classList.remove('clients-track-hover');
+        marquee2.classList.remove('clients-track-hover');
+        hoverListeners.forEach(({ card, enter, leave }) => {
+          card.classList.remove('is-active');
+          card.removeEventListener('pointerenter', enter);
+          card.removeEventListener('pointerleave', leave);
+        });
       };
     },
     { scope: scopeRef },
@@ -110,7 +146,7 @@ const Portfolio: React.FC = () => {
             en resultados reales
           </h2>
           <p className="text-oksap-accent text-lg sm:text-xl max-w-2xl leading-relaxed">
-            Este bloque separa claramente a nuestros clientes directos y a las compañías IT líderes que nos contratan para proyectos estratégicos de SAP HR.
+            Aquí mostramos la red que impulsa nuestro trabajo: clientes que confían en OKSAP y compañías IT de referencia con las que colaboramos en proyectos SAP HR.
           </p>
         </div>
 
@@ -129,18 +165,19 @@ const Portfolio: React.FC = () => {
             <div className="overflow-hidden">
               <div
                 ref={marquee1Ref}
-                className="marquee-1 flex w-max items-center gap-4 sm:gap-5 lg:gap-6 pr-6 will-change-transform"
+                className="clients-marquee-track marquee-1 flex w-max items-center gap-4 sm:gap-5 lg:gap-6 pr-6 will-change-transform"
                 style={{ whiteSpace: 'nowrap' }}
               >
                 {clientMarqueeLogos.map((logo, index) => (
                   <article
                     key={`${logo.id}-${index}`}
-                    className="clients-logo-card inline-flex h-[7.5rem] w-[11rem] sm:h-[8.5rem] sm:w-[13rem] lg:h-[10rem] lg:w-[15rem] items-center justify-center rounded-[1.4rem] border border-white/12 bg-white/[0.05] px-5 py-4 shadow-[0_16px_36px_rgba(0,0,0,0.14)] transform-gpu will-change-transform"
+                    className="clients-logo-card relative inline-flex h-[6.7rem] w-[10rem] sm:h-[7.2rem] sm:w-[11.5rem] lg:h-[8.1rem] lg:w-[13rem] items-center justify-center rounded-[1.2rem] border border-white/10 bg-white/[0.035] px-4 py-3 shadow-[0_10px_26px_rgba(0,0,0,0.12)] transform-gpu will-change-transform"
                   >
+                    <span className="clients-logo-glow pointer-events-none absolute inset-0 rounded-[1.2rem] opacity-0 bg-oksap-silver/55 mix-blend-screen" aria-hidden="true" />
                     <img
                       src={logo.src}
                       alt={logo.alt}
-                      className="clients-logo-image max-h-full max-w-full object-contain opacity-[0.86] grayscale"
+                      className="clients-logo-image max-h-full max-w-full object-contain opacity-[0.84] grayscale transition-[filter,opacity] duration-300"
                       loading="lazy"
                     />
                   </article>
@@ -163,18 +200,19 @@ const Portfolio: React.FC = () => {
             <div className="overflow-hidden">
               <div
                 ref={marquee2Ref}
-                className="marquee-2 flex w-max items-center gap-4 sm:gap-5 lg:gap-6 pr-6 will-change-transform"
+                className="clients-marquee-track marquee-2 flex w-max items-center gap-4 sm:gap-5 lg:gap-6 pr-6 will-change-transform"
                 style={{ whiteSpace: 'nowrap' }}
               >
                 {itMarqueeLogos.map((logo, index) => (
                   <article
                     key={`it-${logo.id}-${index}`}
-                    className="clients-logo-card inline-flex h-[6.7rem] w-[10rem] sm:h-[7.2rem] sm:w-[11.5rem] lg:h-[8.1rem] lg:w-[13rem] items-center justify-center rounded-[1.2rem] border border-white/10 bg-white/[0.035] px-4 py-3 shadow-[0_10px_26px_rgba(0,0,0,0.12)] transform-gpu will-change-transform"
+                    className="clients-logo-card relative inline-flex h-[6.7rem] w-[10rem] sm:h-[7.2rem] sm:w-[11.5rem] lg:h-[8.1rem] lg:w-[13rem] items-center justify-center rounded-[1.2rem] border border-white/10 bg-white/[0.035] px-4 py-3 shadow-[0_10px_26px_rgba(0,0,0,0.12)] transform-gpu will-change-transform"
                   >
+                    <span className="clients-logo-glow pointer-events-none absolute inset-0 rounded-[1.2rem] opacity-0 bg-oksap-silver/55 mix-blend-screen" aria-hidden="true" />
                     <img
                       src={logo.src}
                       alt={logo.alt}
-                      className="clients-logo-image max-h-full max-w-full object-contain opacity-[0.82] grayscale"
+                      className="clients-logo-image max-h-full max-w-full object-contain opacity-[0.84] grayscale transition-[filter,opacity] duration-300"
                       loading="lazy"
                     />
                   </article>

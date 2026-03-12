@@ -62,12 +62,53 @@
   backdrop-filter: blur(12px) saturate(1.1);
 }
 
+.creative-essence-column {
+  display: grid;
+  gap: 0;
+  align-content: start;
+}
+
+.creative-mission-gallery {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+.creative-mission-image {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid rgb(var(--oksap-silver) / 0.32);
+  background: rgb(var(--oksap-navy) / 0.28);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.14),
+    0 10px 22px rgb(0 0 0 / 0.24);
+  aspect-ratio: 16 / 10;
+  opacity: 1;
+  transform: none;
+}
+
+.creative-mission-image img {
+  transform: scale(1.02);
+}
+
 .creative-sticky-stage {
-  min-height: 155svh;
+  min-height: 138svh;
 }
 
 @media (max-width: 1024px) {
   .creative-sticky-stage {
     min-height: auto;
+  }
+
+  .creative-mission-gallery {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .creative-mission-gallery {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
   }
 }
