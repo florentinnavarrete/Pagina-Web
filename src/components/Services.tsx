@@ -45,11 +45,36 @@ const Services: React.FC = () => {
   const scopeRef = useRef<HTMLElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const pinRef = useRef<HTMLDivElement | null>(null);
+  const titleText = 'What We Know to Do';
+  const titleWords = titleText.split(' ');
 
   useGSAP(
     () => {
       const cards = gsap.utils.toArray<HTMLElement>('.services-card', scopeRef.current ?? undefined);
+      const titleWordsEls = gsap.utils.toArray<HTMLElement>('.services-title-word', scopeRef.current ?? undefined);
+      const mediaLayers = gsap.utils.toArray<HTMLElement>('.services-media-layer', scopeRef.current ?? undefined);
+      const iconMagnetic = gsap.utils.toArray<HTMLElement>('.services-icon-magnetic', scopeRef.current ?? undefined);
       const mm = gsap.matchMedia();
+      const disposeMagnetic: Array<() => void> = [];
+
+      if (titleWordsEls.length) {
+        gsap.fromTo(
+          titleWordsEls,
+          { yPercent: 120, opacity: 0 },
+          {
+            yPercent: 0,
+            opacity: 1,
+            duration: 1,
+            stagger: 0.08,
+            ease: 'power4.out',
+            scrollTrigger: {
+              trigger: scopeRef.current,
+              start: 'top 84%',
+              once: true,
+            },
+          },
+        );
+      }
 
       mm.add('(min-width: 1024px)', () => {
         if (!trackRef.current || !pinRef.current) return;
@@ -59,9 +84,12 @@ const Services: React.FC = () => {
           return Math.max(0, trackRef.current.scrollWidth - pinRef.current.clientWidth);
         };
 
+        if (getMaxShift() < 24) return;
+
         gsap.to(trackRef.current, {
           x: () => -getMaxShift(),
           ease: 'none',
+          force3D: true,
           scrollTrigger: {
             trigger: scopeRef.current,
             start: 'top top',
@@ -73,9 +101,28 @@ const Services: React.FC = () => {
           },
         });
 
+        mediaLayers.forEach((layer, index) => {
+          const drift = 8 + index * 2;
+          gsap.fromTo(
+            layer,
+            { xPercent: -drift, force3D: true },
+            {
+              xPercent: drift,
+              ease: 'none',
+              force3D: true,
+              scrollTrigger: {
+                trigger: scopeRef.current,
+                start: 'top top',
+                end: () => `+=${getMaxShift() + window.innerHeight * 0.7}`,
+                scrub: 1,
+              },
+            },
+          );
+        });
+
         gsap.fromTo(
           cards,
-          { y: 36, opacity: 0, scale: 0.98 },
+          { y: 36, opacity: 0, scale: 0.98, force3D: true },
           {
             y: 0,
             opacity: 1,
@@ -83,6 +130,7 @@ const Services: React.FC = () => {
             duration: 0.9,
             stagger: 0.1,
             ease: 'power4.out',
+            force3D: true,
             scrollTrigger: {
               trigger: scopeRef.current,
               start: 'top 82%',
@@ -91,16 +139,16 @@ const Services: React.FC = () => {
           },
         );
 
-        cards.forEach((card) => {
-          const xTo = gsap.quickTo(card, 'x', { duration: 0.28, ease: 'power3.out' });
-          const yTo = gsap.quickTo(card, 'y', { duration: 0.28, ease: 'power3.out' });
+        iconMagnetic.forEach((iconEl) => {
+          const xTo = gsap.quickTo(iconEl, 'x', { duration: 0.28, ease: 'power3.out' });
+          const yTo = gsap.quickTo(iconEl, 'y', { duration: 0.28, ease: 'power3.out' });
 
           const move = (event: PointerEvent) => {
-            const rect = card.getBoundingClientRect();
+            const rect = iconEl.getBoundingClientRect();
             const px = (event.clientX - rect.left) / rect.width - 0.5;
             const py = (event.clientY - rect.top) / rect.height - 0.5;
-            xTo(px * 12);
-            yTo(py * 12);
+            xTo(px * 10);
+            yTo(py * 10);
           };
 
           const leave = () => {
@@ -108,26 +156,27 @@ const Services: React.FC = () => {
             yTo(0);
           };
 
-          card.addEventListener('pointermove', move);
-          card.addEventListener('pointerleave', leave);
+          iconEl.addEventListener('pointermove', move);
+          iconEl.addEventListener('pointerleave', leave);
 
-          return () => {
-            card.removeEventListener('pointermove', move);
-            card.removeEventListener('pointerleave', leave);
-          };
+          disposeMagnetic.push(() => {
+            iconEl.removeEventListener('pointermove', move);
+            iconEl.removeEventListener('pointerleave', leave);
+          });
         });
       });
 
       mm.add('(max-width: 1023px)', () => {
         gsap.fromTo(
           cards,
-          { y: 28, opacity: 0 },
+          { y: 28, opacity: 0, force3D: true },
           {
             y: 0,
             opacity: 1,
             duration: 0.7,
             stagger: 0.12,
             ease: 'power3.out',
+            force3D: true,
             scrollTrigger: {
               trigger: scopeRef.current,
               start: 'top 88%',
@@ -135,9 +184,38 @@ const Services: React.FC = () => {
             },
           },
         );
+
+        iconMagnetic.forEach((iconEl) => {
+          const xTo = gsap.quickTo(iconEl, 'x', { duration: 0.26, ease: 'power3.out' });
+          const yTo = gsap.quickTo(iconEl, 'y', { duration: 0.26, ease: 'power3.out' });
+
+          const move = (event: PointerEvent) => {
+            const rect = iconEl.getBoundingClientRect();
+            const nx = (event.clientX - rect.left) / rect.width - 0.5;
+            const ny = (event.clientY - rect.top) / rect.height - 0.5;
+            xTo(nx * 10);
+            yTo(ny * 10);
+          };
+
+          const leave = () => {
+            xTo(0);
+            yTo(0);
+          };
+
+          iconEl.addEventListener('pointermove', move);
+          iconEl.addEventListener('pointerleave', leave);
+
+          disposeMagnetic.push(() => {
+            iconEl.removeEventListener('pointermove', move);
+            iconEl.removeEventListener('pointerleave', leave);
+          });
+        });
       });
 
-      return () => mm.revert();
+      return () => {
+        disposeMagnetic.forEach((dispose) => dispose());
+        mm.revert();
+      };
     },
     { scope: scopeRef },
   );
@@ -160,7 +238,11 @@ const Services: React.FC = () => {
       <div className="max-w-[1680px] mx-auto">
         <header className="text-center mb-10 sm:mb-12 lg:mb-14">
           <h2 className="font-hero text-[clamp(2rem,4.8vw,4.4rem)] leading-[0.95] text-oksap-navy tracking-[0.01em]">
-            What We Know to Do
+            {titleWords.map((word, index) => (
+              <span key={`${word}-${index}`} className="inline-block overflow-hidden align-top pr-[0.16em]">
+                <span className="services-title-word inline-block">{word}</span>
+              </span>
+            ))}
           </h2>
         </header>
 
@@ -172,8 +254,12 @@ const Services: React.FC = () => {
             {SERVICES.map((service) => (
               <article
                 key={service.id}
-                className="services-card relative overflow-hidden rounded-[1.6rem] border border-white/18 bg-white/8 backdrop-blur-xl shadow-[0_20px_44px_rgba(0,0,0,0.22)] p-6 sm:p-7 lg:p-8 lg:w-[min(34rem,78vw)] lg:min-h-[24rem]"
+                className="services-card relative overflow-hidden rounded-[1.6rem] border border-white/18 bg-white/6 shadow-[0_20px_44px_rgba(0,0,0,0.18)] p-6 sm:p-7 lg:p-8 lg:w-[min(36rem,80vw)] lg:min-h-[25rem] transform-gpu will-change-transform"
               >
+                <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
+                  <div className="services-media-layer absolute inset-[-8%] bg-[radial-gradient(ellipse_70%_60%_at_16%_22%,rgba(203,238,243,0.18),transparent_64%),radial-gradient(ellipse_56%_50%_at_86%_80%,rgba(245,167,203,0.16),transparent_64%),linear-gradient(135deg,rgba(0,0,0,0.24),rgba(0,0,0,0.06))]" />
+                </div>
+
                 <span
                   aria-hidden="true"
                   className="absolute -top-8 -right-2 font-hero text-[6rem] sm:text-[7.5rem] leading-none text-white/7 select-none"
@@ -182,7 +268,7 @@ const Services: React.FC = () => {
                 </span>
 
                 <div className="relative z-10 h-full flex flex-col">
-                  <div className="inline-flex w-fit items-center rounded-full border border-oksap-accent/40 bg-oksap-accent/15 px-3 py-1 text-xs sm:text-sm uppercase tracking-[0.12em] text-oksap-silver mb-5">
+                  <div className="services-icon-magnetic inline-flex w-fit items-center rounded-full border border-oksap-accent/40 bg-oksap-accent/15 px-3 py-1 text-xs sm:text-sm uppercase tracking-[0.12em] text-oksap-silver mb-5">
                     {renderIcon(service.icon)}
                   </div>
 

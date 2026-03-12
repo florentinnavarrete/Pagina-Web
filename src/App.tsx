@@ -2,12 +2,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Linkedin, Instagram, Twitter, Mail, Globe, Menu, X } from 'lucide-react';
 import { SiTiktok } from 'react-icons/si';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { COMPANY_INFO } from './constants';
 import logoImage from './assets/logo.png';
 import CreativeSection from './components/CreativeSection';
 import Services from './components/Services';
 import useSmoothScroll from './hooks/useSmoothScroll';
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
+ScrollTrigger.config({ limitCallbacks: true, ignoreMobileResize: true });
 
 type Locale = 'es' | 'en';
 
@@ -31,8 +35,11 @@ const App: React.FC = () => {
   const cursorTrailRafRef = useRef<number | null>(null);
   const cursorTargetRef = useRef({ x: 0, y: 0 });
   const heroSectionRef = useRef<HTMLElement | null>(null);
+  const headerLogoButtonRef = useRef<HTMLButtonElement | null>(null);
+  const heroLogoSlotRef = useRef<HTMLDivElement | null>(null);
+  const heroLogoOverlayRef = useRef<HTMLImageElement | null>(null);
 
-  useSmoothScroll();
+  const lenisRef = useSmoothScroll();
 
   const [orbitStep, setOrbitStep] = useState(0);
   const [locale, setLocale] = useState<Locale>('es');
@@ -42,7 +49,12 @@ const App: React.FC = () => {
     setMenuOpen(false);
     const section = document.getElementById(id);
     if (section) {
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (lenisRef.current) {
+        lenisRef.current.scrollTo(section, { offset: -24 });
+        return;
+      }
+
+      section.scrollIntoView({ behavior: 'auto', block: 'start' });
     }
   };
 
@@ -134,17 +146,104 @@ const App: React.FC = () => {
   useGSAP(
     () => {
       const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
+      const heroLogoSlot = heroLogoSlotRef.current;
+      const heroLogoOverlay = heroLogoOverlayRef.current;
+      const headerLogoButton = headerLogoButtonRef.current;
+      const heroSection = heroSectionRef.current;
+
+      let heroRect = { left: 0, top: 0, width: 0, height: 0 };
+      let headerRect = { left: 0, top: 0, width: 0, height: 0 };
+
+      const measureLogos = () => {
+        if (!heroLogoSlot || !headerLogoButton) return;
+        const heroBounds = heroLogoSlot.getBoundingClientRect();
+        const headerBounds = headerLogoButton.getBoundingClientRect();
+        heroRect = {
+          left: heroBounds.left,
+          top: heroBounds.top,
+          width: heroBounds.width,
+          height: heroBounds.height,
+        };
+        headerRect = {
+          left: headerBounds.left,
+          top: headerBounds.top,
+          width: headerBounds.width,
+          height: headerBounds.height,
+        };
+      };
+
+      const setLogoToHero = () => {
+        if (!heroLogoOverlay) return;
+        gsap.set(heroLogoOverlay, {
+          x: heroRect.left,
+          y: heroRect.top,
+          width: heroRect.width,
+          height: heroRect.height,
+          autoAlpha: 1,
+          opacity: 1,
+          scale: 1,
+          force3D: true,
+          transformOrigin: 'top left',
+        });
+      };
 
       tl.fromTo(
         '.hero-modern-orb',
-        { opacity: 0, scale: 0.84, y: 30 },
-        { opacity: 1, scale: 1, y: 0, duration: 1.2, stagger: 0.12 },
+        { opacity: 0, scale: 0.84, y: 30, force3D: true },
+        { opacity: 1, scale: 1, y: 0, duration: 1.2, stagger: 0.12, force3D: true },
       ).fromTo(
         '.hero-modern-item',
-        { y: 56, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.05, stagger: 0.14 },
+        { y: 56, opacity: 0, force3D: true },
+        { y: 0, opacity: 1, duration: 1.05, stagger: 0.14, force3D: true },
         '-=0.9',
       );
+
+      if (heroLogoSlot && heroLogoOverlay && headerLogoButton && heroSection) {
+        measureLogos();
+        setLogoToHero();
+        gsap.set(headerLogoButton, { autoAlpha: 0, force3D: true });
+
+        const logoTimeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: heroSection,
+            start: 'top top',
+            end: 'bottom top+=88',
+            scrub: 1.5,
+            invalidateOnRefresh: true,
+          },
+        });
+
+        logoTimeline
+          .to(heroLogoOverlay, {
+            x: () => headerRect.left,
+            y: () => headerRect.top,
+            scale: () => headerRect.width / heroRect.width,
+            opacity: 0.92,
+            ease: 'expo.out',
+            force3D: true,
+          }, 0)
+          .to(heroLogoOverlay, {
+            opacity: 0,
+            ease: 'power4.out',
+            force3D: true,
+          }, 0.84)
+          .to(headerLogoButton, {
+            autoAlpha: 1,
+            ease: 'power4.out',
+            force3D: true,
+          }, 0.7);
+
+        const refreshLogoMetrics = () => {
+          measureLogos();
+          setLogoToHero();
+        };
+
+        ScrollTrigger.addEventListener('refreshInit', refreshLogoMetrics);
+
+        return () => {
+          ScrollTrigger.removeEventListener('refreshInit', refreshLogoMetrics);
+        };
+      }
     },
     { scope: heroSectionRef },
   );
@@ -203,6 +302,12 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-oksap-light font-sans relative overflow-x-clip" style={{ cursor: 'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSI2IiBzdHJva2U9IiNDQkVFRjMiIHN0cm9rZS13aWR0aD0iMS41IiBmaWxsPSJub25lIi8+PC9zdmc+) 12 12, auto' }}>
+      <img
+        ref={heroLogoOverlayRef}
+        src={logoImage}
+        alt="OKSAP transition"
+        className="oksap-logo-transition fixed top-0 left-0 z-[135] pointer-events-none h-auto object-contain"
+      />
       <div
         ref={cursorTrailRef}
         className="fixed w-16 h-16 rounded-full pointer-events-none z-40"
@@ -223,13 +328,13 @@ const App: React.FC = () => {
           <div className="flex items-center justify-between gap-4 px-1 sm:px-2 py-1">
             {/* Logo a la izquierda */}
             <button
+              ref={headerLogoButtonRef}
               type="button"
               onClick={() => scrollToSection('home')}
               aria-label="OKSAP SPAIN"
               className="pointer-events-auto shrink-0"
-              style={{ opacity: window.scrollY > window.innerHeight * 1.2 ? 1 : 0, visibility: 'visible' }}
             >
-              <img src={logoImage} alt="OKSAP" className="h-9 sm:h-10 lg:h-10 w-auto object-contain" />
+              <img src={logoImage} alt="OKSAP" className="h-9 sm:h-10 lg:h-10 w-auto object-contain transform-gpu will-change-transform" />
             </button>
 
             {/* Nav en el centro */}
@@ -348,15 +453,15 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              {/* Logo inferior izquierda */}
-              <div className="pl-4 sm:pl-8 lg:pl-12">
-                <img
-                  src={logoImage}
-                  alt="OKSAP SPAIN"
-                  className="hero-modern-item w-[min(520px,88vw)] sm:w-[min(620px,78vw)] lg:w-[min(700px,62vw)] h-auto object-contain"
-                />
+              <div className="flex justify-center items-end flex-1 pb-6 sm:pb-8 lg:pb-10">
+                <div ref={heroLogoSlotRef} className="w-[min(520px,88vw)] sm:w-[min(620px,78vw)] lg:w-[min(700px,62vw)] h-auto opacity-0">
+                  <img
+                    src={logoImage}
+                    alt="OKSAP SPAIN"
+                    className="hero-logo-primary w-full h-auto object-contain transform-gpu will-change-transform"
+                  />
+                </div>
               </div>
-
             </div>
           </div>
 

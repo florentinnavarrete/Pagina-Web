@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
-import Lenis, { type LenisOptions } from 'lenis';
+import Lenis from 'lenis';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+type LenisOptions = ConstructorParameters<typeof Lenis>[0];
 
 const DEFAULT_LENIS_OPTIONS: LenisOptions = {
   duration: 1,
