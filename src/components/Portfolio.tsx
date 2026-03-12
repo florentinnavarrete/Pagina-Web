@@ -10,22 +10,22 @@ type LogoItem = {
 
 const Portfolio: React.FC = () => {
   const scopeRef = useRef<HTMLElement | null>(null);
-  const clientsTrackRef = useRef<HTMLDivElement | null>(null);
-  const itTrackRef = useRef<HTMLDivElement | null>(null);
+  const marquee1Ref = useRef<HTMLDivElement | null>(null);
+  const marquee2Ref = useRef<HTMLDivElement | null>(null);
 
   const clientLogoModules = import.meta.glob('../assets/Clients/*.png', {
     eager: true,
     import: 'default',
   }) as Record<string, string>;
 
-  const logos: LogoItem[] = useMemo(
+  const clientLogos: LogoItem[] = useMemo(
     () =>
       Object.keys(clientLogoModules)
         .sort()
         .map((path, index) => ({
           id: index + 1,
           src: clientLogoModules[path],
-          alt: `Logo cliente ${index + 1}`,
+          alt: `Client logo ${index + 1}`,
         })),
     [clientLogoModules],
   );
@@ -42,23 +42,22 @@ const Portfolio: React.FC = () => {
         .map((path, index) => ({
           id: index + 1,
           src: itLogoModules[path],
-          alt: `Logo partner IT ${index + 1}`,
+          alt: `IT company logo ${index + 1}`,
         })),
     [itLogoModules],
   );
 
-  const clientMarqueeLogos = useMemo(() => [...logos, ...logos], [logos]);
+  const clientMarqueeLogos = useMemo(() => [...clientLogos, ...clientLogos], [clientLogos]);
   const itMarqueeLogos = useMemo(() => [...itLogos, ...itLogos], [itLogos]);
 
   useGSAP(
     () => {
-      const clientsTrack = clientsTrackRef.current;
-      const itTrack = itTrackRef.current;
-      const logoCards = gsap.utils.toArray<HTMLElement>('.clients-logo-card', scopeRef.current ?? undefined);
-      if (!clientsTrack || !itTrack) return;
+      const marquee1 = marquee1Ref.current;
+      const marquee2 = marquee2Ref.current;
+      if (!marquee1 || !marquee2) return;
 
-      // Marquee infinito usando lista duplicada para no generar saltos.
-      const marqueeTween = gsap.to(clientsTrack, {
+      // Animación infinita del carrusel 1 (izquierda).
+      const tween1 = gsap.to(marquee1, {
         xPercent: -50,
         duration: 28,
         repeat: -1,
@@ -66,8 +65,9 @@ const Portfolio: React.FC = () => {
         force3D: true,
       });
 
-      const reverseMarqueeTween = gsap.fromTo(
-        itTrack,
+      // Animación infinita del carrusel 2 (derecha).
+      const tween2 = gsap.fromTo(
+        marquee2,
         { xPercent: -50 },
         {
           xPercent: 0,
@@ -78,46 +78,22 @@ const Portfolio: React.FC = () => {
         },
       );
 
-      const slowDown = () => gsap.to(marqueeTween, { timeScale: 0.22, duration: 0.45, ease: 'power3.out' });
-      const speedUp = () => gsap.to(marqueeTween, { timeScale: 1, duration: 0.45, ease: 'power3.out' });
+      // Pausa suave por hover por carrusel (sin afectar títulos ni layout).
+      const pause1 = () => gsap.to(tween1, { timeScale: 0, duration: 0.35, ease: 'power2.out' });
+      const play1 = () => gsap.to(tween1, { timeScale: 1, duration: 0.35, ease: 'power2.out' });
+      const pause2 = () => gsap.to(tween2, { timeScale: 0, duration: 0.35, ease: 'power2.out' });
+      const play2 = () => gsap.to(tween2, { timeScale: 1, duration: 0.35, ease: 'power2.out' });
 
-      const slowDownReverse = () => gsap.to(reverseMarqueeTween, { timeScale: 0.22, duration: 0.45, ease: 'power3.out' });
-      const speedUpReverse = () => gsap.to(reverseMarqueeTween, { timeScale: 1, duration: 0.45, ease: 'power3.out' });
-
-      clientsTrack.addEventListener('pointerenter', slowDown);
-      clientsTrack.addEventListener('pointerleave', speedUp);
-      itTrack.addEventListener('pointerenter', slowDownReverse);
-      itTrack.addEventListener('pointerleave', speedUpReverse);
-
-      const cardListeners: Array<{ card: HTMLElement; enter: () => void; leave: () => void }> = [];
-      logoCards.forEach((card) => {
-        const logo = card.querySelector<HTMLElement>('.clients-logo-image');
-        if (!logo) return;
-
-        const enter = () => {
-          gsap.to(card, { scale: 1.05, duration: 0.38, ease: 'power3.out', force3D: true });
-          gsap.to(logo, { filter: 'grayscale(0%)', opacity: 1, duration: 0.38, ease: 'power3.out' });
-        };
-
-        const leave = () => {
-          gsap.to(card, { scale: 1, duration: 0.38, ease: 'power3.out', force3D: true });
-          gsap.to(logo, { filter: 'grayscale(100%)', opacity: 0.82, duration: 0.38, ease: 'power3.out' });
-        };
-
-        card.addEventListener('pointerenter', enter);
-        card.addEventListener('pointerleave', leave);
-        cardListeners.push({ card, enter, leave });
-      });
+      marquee1.addEventListener('pointerenter', pause1);
+      marquee1.addEventListener('pointerleave', play1);
+      marquee2.addEventListener('pointerenter', pause2);
+      marquee2.addEventListener('pointerleave', play2);
 
       return () => {
-        clientsTrack.removeEventListener('pointerenter', slowDown);
-        clientsTrack.removeEventListener('pointerleave', speedUp);
-        itTrack.removeEventListener('pointerenter', slowDownReverse);
-        itTrack.removeEventListener('pointerleave', speedUpReverse);
-        cardListeners.forEach(({ card, enter, leave }) => {
-          card.removeEventListener('pointerenter', enter);
-          card.removeEventListener('pointerleave', leave);
-        });
+        marquee1.removeEventListener('pointerenter', pause1);
+        marquee1.removeEventListener('pointerleave', play1);
+        marquee2.removeEventListener('pointerenter', pause2);
+        marquee2.removeEventListener('pointerleave', play2);
       };
     },
     { scope: scopeRef },
@@ -129,52 +105,82 @@ const Portfolio: React.FC = () => {
         <div className="mb-12 sm:mb-16 lg:mb-20 max-w-4xl">
           <p className="text-xs uppercase tracking-[0.22em] text-oksap-silver font-bold mb-4">Network</p>
           <h2 className="font-hero text-[clamp(2.3rem,5.2vw,5.4rem)] leading-[0.94] text-oksap-navy mb-5">
-            Empresas que confían en nosotros,
+            Confianza que se traduce
             <br />
-            Partners IT que respaldan nuestro trabajo
+            en resultados reales
           </h2>
           <p className="text-oksap-accent text-lg sm:text-xl max-w-2xl leading-relaxed">
-            Mostramos dos carruseles con roles distintos: clientes finales de OKSAP y compañías IT de referencia con las que colaboramos en proyectos de alto impacto.
+            Este bloque separa claramente a nuestros clientes directos y a las compañías IT líderes que nos contratan para proyectos estratégicos de SAP HR.
           </p>
         </div>
 
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-md py-8 sm:py-10 lg:py-12 space-y-5 sm:space-y-6">
+        <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-md py-8 sm:py-10 lg:py-12 space-y-8 sm:space-y-10">
           <div className="px-5 sm:px-7 lg:px-8">
-            <p className="text-[11px] sm:text-xs uppercase tracking-[0.2em] text-oksap-silver font-bold mb-3">Our Clients</p>
-          </div>
-          <div ref={clientsTrackRef} className="flex w-max items-center gap-4 sm:gap-5 lg:gap-6 pr-6 will-change-transform">
-            {clientMarqueeLogos.map((logo, index) => (
-              <article
-                key={`${logo.id}-${index}`}
-                className="clients-logo-card flex h-[7.5rem] w-[11rem] sm:h-[8.5rem] sm:w-[13rem] lg:h-[10rem] lg:w-[15rem] items-center justify-center rounded-[1.4rem] border border-white/12 bg-white/[0.05] px-5 py-4 shadow-[0_16px_36px_rgba(0,0,0,0.14)] transform-gpu will-change-transform"
+            <div className="flex items-center justify-between gap-4 mb-3">
+              <p className="text-[11px] sm:text-xs uppercase tracking-[0.2em] text-oksap-silver font-bold">Our Clients</p>
+              <div className="flex items-center gap-2" aria-hidden="true">
+                <span className="h-1.5 w-1.5 rounded-full bg-oksap-silver/80"></span>
+                <span className="h-1.5 w-1.5 rounded-full bg-oksap-silver/55"></span>
+                <span className="h-1.5 w-1.5 rounded-full bg-oksap-silver/35"></span>
+              </div>
+            </div>
+
+            {/* Máscara estática: sólo se mueve la fila interna de logos. */}
+            <div className="overflow-hidden">
+              <div
+                ref={marquee1Ref}
+                className="marquee-1 flex w-max items-center gap-4 sm:gap-5 lg:gap-6 pr-6 will-change-transform"
+                style={{ whiteSpace: 'nowrap' }}
               >
-                <img
-                  src={logo.src}
-                  alt={logo.alt}
-                  className="clients-logo-image max-h-full max-w-full object-contain opacity-[0.82] grayscale will-change-[filter,opacity]"
-                  loading="lazy"
-                />
-              </article>
-            ))}
+                {clientMarqueeLogos.map((logo, index) => (
+                  <article
+                    key={`${logo.id}-${index}`}
+                    className="clients-logo-card inline-flex h-[7.5rem] w-[11rem] sm:h-[8.5rem] sm:w-[13rem] lg:h-[10rem] lg:w-[15rem] items-center justify-center rounded-[1.4rem] border border-white/12 bg-white/[0.05] px-5 py-4 shadow-[0_16px_36px_rgba(0,0,0,0.14)] transform-gpu will-change-transform"
+                  >
+                    <img
+                      src={logo.src}
+                      alt={logo.alt}
+                      className="clients-logo-image max-h-full max-w-full object-contain opacity-[0.86] grayscale"
+                      loading="lazy"
+                    />
+                  </article>
+                ))}
+              </div>
+            </div>
           </div>
 
-          <div className="px-5 sm:px-7 lg:px-8 pt-2">
-            <p className="text-[11px] sm:text-xs uppercase tracking-[0.2em] text-oksap-silver font-bold mb-3">Contracted by the Best IT Companies</p>
-          </div>
-          <div ref={itTrackRef} className="flex w-max items-center gap-4 sm:gap-5 lg:gap-6 pr-6 will-change-transform">
-            {itMarqueeLogos.map((logo, index) => (
-              <article
-                key={`it-${logo.id}-${index}`}
-                className="clients-logo-card flex h-[6.7rem] w-[10rem] sm:h-[7.2rem] sm:w-[11.5rem] lg:h-[8.1rem] lg:w-[13rem] items-center justify-center rounded-[1.2rem] border border-white/10 bg-white/[0.035] px-4 py-3 shadow-[0_10px_26px_rgba(0,0,0,0.12)] transform-gpu will-change-transform"
+          <div className="px-5 sm:px-7 lg:px-8">
+            <div className="flex items-center justify-between gap-4 mb-3">
+              <p className="text-[11px] sm:text-xs uppercase tracking-[0.2em] text-oksap-silver font-bold">Contracted by the Best IT Companies</p>
+              <div className="flex items-center gap-2" aria-hidden="true">
+                <span className="h-1.5 w-1.5 rounded-full bg-oksap-silver/80"></span>
+                <span className="h-1.5 w-1.5 rounded-full bg-oksap-silver/55"></span>
+                <span className="h-1.5 w-1.5 rounded-full bg-oksap-silver/35"></span>
+              </div>
+            </div>
+
+            {/* Máscara estática: sólo se mueve la fila interna de logos. */}
+            <div className="overflow-hidden">
+              <div
+                ref={marquee2Ref}
+                className="marquee-2 flex w-max items-center gap-4 sm:gap-5 lg:gap-6 pr-6 will-change-transform"
+                style={{ whiteSpace: 'nowrap' }}
               >
-                <img
-                  src={logo.src}
-                  alt={logo.alt}
-                  className="clients-logo-image max-h-full max-w-full object-contain opacity-[0.8] grayscale will-change-[filter,opacity]"
-                  loading="lazy"
-                />
-              </article>
-            ))}
+                {itMarqueeLogos.map((logo, index) => (
+                  <article
+                    key={`it-${logo.id}-${index}`}
+                    className="clients-logo-card inline-flex h-[6.7rem] w-[10rem] sm:h-[7.2rem] sm:w-[11.5rem] lg:h-[8.1rem] lg:w-[13rem] items-center justify-center rounded-[1.2rem] border border-white/10 bg-white/[0.035] px-4 py-3 shadow-[0_10px_26px_rgba(0,0,0,0.12)] transform-gpu will-change-transform"
+                  >
+                    <img
+                      src={logo.src}
+                      alt={logo.alt}
+                      className="clients-logo-image max-h-full max-w-full object-contain opacity-[0.82] grayscale"
+                      loading="lazy"
+                    />
+                  </article>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>

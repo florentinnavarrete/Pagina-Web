@@ -9,6 +9,7 @@ import logoImage from './assets/logo.png';
 import CreativeSection from './components/CreativeSection';
 import Portfolio from './components/Portfolio';
 import Services from './components/Services';
+import BackgroundAtmosphere from './components/BackgroundAtmosphere';
 import useSmoothScroll from './hooks/useSmoothScroll';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -302,7 +303,8 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-oksap-light font-sans relative overflow-x-clip" style={{ cursor: 'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSI2IiBzdHJva2U9IiNDQkVFRjMiIHN0cm9rZS13aWR0aD0iMS41IiBmaWxsPSJub25lIi8+PC9zdmc+) 12 12, auto' }}>
+    <div className="min-h-screen bg-transparent font-sans relative overflow-x-clip" style={{ cursor: 'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSI2IiBzdHJva2U9IiNDQkVFRjMiIHN0cm9rZS13aWR0aD0iMS41IiBmaWxsPSJub25lIi8+PC9zdmc+) 12 12, auto' }}>
+      <BackgroundAtmosphere />
       <img
         ref={heroLogoOverlayRef}
         src={logoImage}
@@ -322,8 +324,6 @@ const App: React.FC = () => {
           willChange: 'transform, opacity'
         }}
       />
-      <div className="global-ambient-bg" aria-hidden="true" />
-
       <header className="fixed inset-x-0 top-0 z-[120] px-3 sm:px-4 lg:px-6 pt-3 sm:pt-4">
         <div className="max-w-[1680px] mx-auto">
           <div className="flex items-center justify-between gap-4 px-1 sm:px-2 py-1">
@@ -481,9 +481,9 @@ const App: React.FC = () => {
           }))}
         />
 
-        <Portfolio />
-
         <Services />
+
+        <Portfolio />
 
         <section id="contact" className="contact-section-center relative px-3 sm:px-4 lg:px-6 bg-oksap-background/40 nfc-parallax">
           <div className="max-w-[1680px] mx-auto w-full">

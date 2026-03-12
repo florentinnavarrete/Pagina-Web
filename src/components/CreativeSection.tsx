@@ -89,8 +89,8 @@ const CreativeSection: React.FC<CreativeSectionProps> = ({
   );
 
   return (
-    <section ref={scopeRef} className="creative-section relative px-3 sm:px-4 lg:px-6 py-20 sm:py-24 lg:py-32">
-      <div className="max-w-[1680px] mx-auto space-y-16 sm:space-y-20">
+    <section ref={scopeRef} className="creative-section relative px-3 sm:px-4 lg:px-6 pt-8 sm:pt-10 lg:pt-12 pb-16 sm:pb-18 lg:pb-24">
+      <div className="max-w-[1680px] mx-auto space-y-8 sm:space-y-10 lg:space-y-12">
         <header className="max-w-5xl">
           {eyebrow ? (
             <p className="text-xs sm:text-sm uppercase tracking-[0.22em] text-oksap-silver/80 mb-4">{eyebrow}</p>
@@ -104,13 +104,13 @@ const CreativeSection: React.FC<CreativeSectionProps> = ({
           </h1>
         </header>
 
-        <div ref={stickyStageRef} className="creative-sticky-stage grid grid-cols-1 lg:grid-cols-[minmax(260px,0.75fr)_1fr] gap-8 lg:gap-14">
+        <div ref={stickyStageRef} className="creative-sticky-stage grid grid-cols-1 lg:grid-cols-[minmax(260px,0.75fr)_1fr] gap-5 sm:gap-6 lg:gap-10">
           <div ref={stickyPinRef} className="creative-sticky-pin creative-sticky-pin--featured self-start rounded-3xl p-6 sm:p-7">
             <h3 className="font-hero text-2xl sm:text-3xl text-oksap-navy mb-3">{stickyTitle}</h3>
             <p className="text-white/80 leading-relaxed text-base sm:text-lg">{stickyText}</p>
           </div>
 
-          <div className="creative-stream space-y-5 sm:space-y-6">
+          <div className="creative-stream space-y-3 sm:space-y-4">
             {items.map((item, index) => (
               <article
                 key={item.title}
