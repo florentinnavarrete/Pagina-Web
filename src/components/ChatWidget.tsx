@@ -10,6 +10,7 @@ import claraImg from '../assets/Clara.png';
 import sandraImg from '../assets/Sandra.png';
 import { GenerateContentResponse } from '@google/genai';
 import { COMPANY_INFO } from '../constants';
+import AnimatedImage from './AnimatedImage';
 
 // Define Assistant Type
 interface Assistant {
@@ -248,15 +249,14 @@ const ChatWidget: React.FC = () => {
           aria-label="Chat with AI"
         >
           {/* Dynamic Avatar based on selection */}
-          <img 
-            src={launcherAvatar} 
-            alt="Chat Assistant" 
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              // Fallback if image fails
-              (e.target as HTMLImageElement).style.display = 'none';
-              ((e.target as HTMLImageElement).parentElement as HTMLElement).innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2 2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><rect width="18" height="12" x="3" y="8" rx="2"/><path d="M9 13h6"/><path d="M10 17h4"/></svg>';
-            }}
+          <AnimatedImage
+            src={launcherAvatar}
+            alt="Chat Assistant"
+            className="w-full h-full"
+            roundedClassName="rounded-full"
+            imageClassName="object-cover"
+            enableScrollFx={false}
+            enableHoverFx={false}
           />
         </button>
       )}
@@ -294,7 +294,15 @@ const ChatWidget: React.FC = () => {
                        className="flex items-center gap-4 p-4 rounded-xl bg-oksap-primary/20 hover:shadow-lg hover:bg-gradient-to-r hover:from-oksap-primary/30 to-oksap-silver/10 transition-all duration-300 group text-left" style={{ borderWidth: '2px', borderColor: 'var(--oksap-dark-hex)' }}
                      >
                           <div className="w-14 h-14 rounded-full border-3 relative shadow-md group-hover:scale-105 transition-transform" style={{ borderColor: 'var(--oksap-silver-hex)', backgroundColor: 'rgb(var(--oksap-silver) / 0.2)' }}>
-                          <img src={assistant.avatar} alt={assistant.name} className="w-full h-full object-cover rounded-full" />
+                          <AnimatedImage
+                            src={assistant.avatar}
+                            alt={assistant.name}
+                            className="w-full h-full"
+                            roundedClassName="rounded-full"
+                            imageClassName="object-cover"
+                            enableScrollFx={false}
+                            enableHoverFx={false}
+                          />
                           <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full z-10"></div>
                         </div>
                         <div>
@@ -316,7 +324,15 @@ const ChatWidget: React.FC = () => {
               <div className="text-white p-4 flex justify-between items-center sm:rounded-t-2xl shrink-0 shadow-lg" style={{ backgroundColor: 'var(--oksap-dark-hex)' }}>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full border-2 relative" style={{ borderColor: 'var(--oksap-silver-hex)', backgroundColor: 'rgb(var(--oksap-silver) / 0.12)' }}>
-                     <img src={selectedAssistant.avatar} alt={selectedAssistant.name} className="w-full h-full object-cover rounded-full" />
+                     <AnimatedImage
+                       src={selectedAssistant.avatar}
+                       alt={selectedAssistant.name}
+                       className="w-full h-full"
+                       roundedClassName="rounded-full"
+                       imageClassName="object-cover"
+                       enableScrollFx={false}
+                       enableHoverFx={false}
+                     />
                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full z-10"></div>
                   </div>
                   <div>
@@ -354,7 +370,15 @@ const ChatWidget: React.FC = () => {
                     {/* Optional: Show tiny avatar next to model messages */}
                     {msg.sender === Sender.MODEL && (
                         <div className="w-6 h-6 rounded-full overflow-hidden shrink-0 mr-2 mt-1 border-2 shadow-sm" style={{ borderColor: 'var(--oksap-silver-hex)' }}>
-                         <img src={selectedAssistant.avatar} alt="Bot" className="w-full h-full object-cover" />
+                         <AnimatedImage
+                           src={selectedAssistant.avatar}
+                           alt="Bot"
+                           className="w-full h-full"
+                           roundedClassName="rounded-full"
+                           imageClassName="object-cover"
+                           enableScrollFx={false}
+                           enableHoverFx={false}
+                         />
                        </div>
                     )}
                     
@@ -372,7 +396,15 @@ const ChatWidget: React.FC = () => {
                 {isLoading && (
                   <div className="flex justify-start items-end animate-fade-in">
                     <div className="w-6 h-6 rounded-full overflow-hidden shrink-0 mr-2 mb-1 border-2 shadow-sm" style={{ borderColor: 'var(--oksap-silver-hex)' }}>
-                         <img src={selectedAssistant.avatar} alt="Bot" className="w-full h-full object-cover" />
+                         <AnimatedImage
+                           src={selectedAssistant.avatar}
+                           alt="Bot Typing"
+                           className="w-full h-full"
+                           roundedClassName="rounded-full"
+                           imageClassName="object-cover"
+                           enableScrollFx={false}
+                           enableHoverFx={false}
+                         />
                     </div>
                     <div className="bg-oksap-primary/20 border-2 p-3 rounded-2xl rounded-tl-none flex gap-2 shadow-md" style={{ borderColor: 'var(--oksap-silver-hex)' }}>
                         <div className="w-2 h-2 bg-oksap-accent rounded-full animate-bounce"></div>

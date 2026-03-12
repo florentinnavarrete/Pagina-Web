@@ -7,6 +7,7 @@ import { useGSAP } from '@gsap/react';
 import { COMPANY_INFO } from './constants';
 import logoImage from './assets/logo.png';
 import CreativeSection from './components/CreativeSection';
+import Portfolio from './components/Portfolio';
 import Services from './components/Services';
 import useSmoothScroll from './hooks/useSmoothScroll';
 
@@ -479,6 +480,8 @@ const App: React.FC = () => {
             body: card.text,
           }))}
         />
+
+        <Portfolio />
 
         <Services />
 

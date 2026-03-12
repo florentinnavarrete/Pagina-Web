@@ -5,6 +5,7 @@ import { Icons } from './Icons';
 import { COMPANY_INFO } from '../constants';
 import { Download, Share2, ArrowRight } from 'lucide-react';
 import testImage from '../assets/test.png';
+import AnimatedImage from './AnimatedImage';
 
 const Hero: React.FC = () => {
   const generateVCardData = () => {
@@ -176,9 +177,14 @@ const Hero: React.FC = () => {
               <div className="relative bg-oksap-primary/15 rounded-3xl p-8 xl:p-10 shadow-2xl border border-oksap-navy/20">
                 <div className="mb-6">
                   <p className="text-[11px] uppercase tracking-[0.2em] text-oksap-silver font-bold mb-4">Perfil corporativo</p>
-                  <div className="w-24 h-24 mb-6 rounded-2xl overflow-hidden">
-                    <img src={testImage} alt="OKSAP" className="w-full h-full object-cover" />
-                  </div>
+                  <AnimatedImage
+                    src={testImage}
+                    alt="OKSAP Hero Card"
+                    className="w-24 h-24 mb-6"
+                    roundedClassName="rounded-2xl"
+                    imageClassName="object-cover"
+                    effect="liquid"
+                  />
                   <h3 className="text-2xl font-bold text-oksap-accent mb-2">{COMPANY_INFO.name}</h3>
                   <p className="text-oksap-navy font-semibold mb-4">{COMPANY_INFO.tagline}</p>
                 </div>
@@ -222,9 +228,14 @@ const Hero: React.FC = () => {
         {/* Mobile Company Card */}
         <div className="lg:hidden mt-12">
           <div className="bg-oksap-primary/15 rounded-3xl p-6 shadow-xl border border-oksap-navy/20 text-center">
-            <div className="w-20 h-20 mx-auto mb-4 rounded-2xl overflow-hidden">
-              <img src={testImage} alt="OKSAP" className="w-full h-full object-cover" />
-            </div>
+            <AnimatedImage
+              src={testImage}
+              alt="OKSAP Hero Mobile"
+              className="w-20 h-20 mx-auto mb-4"
+              roundedClassName="rounded-2xl"
+              imageClassName="object-cover"
+              effect="liquid"
+            />
             <div className="grid grid-cols-3 gap-3 mb-6">
               <div>
                 <p className="text-2xl font-black text-oksap-silver">10+</p>

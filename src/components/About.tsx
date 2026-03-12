@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Award, Briefcase, Users, TrendingUp } from 'lucide-react';
 import { COMPANY_INFO } from '../constants';
+import AnimatedImage from './AnimatedImage';
 
 const About: React.FC = () => {
   const aboutImageModules = import.meta.glob('../assets/nosotros/*.{png,jpg,jpeg,webp,avif}', {
@@ -117,19 +118,14 @@ const About: React.FC = () => {
             <div className="relative bg-oksap-primary/20 rounded-3xl p-12 border border-oksap-silver/70">
               <div className="aspect-square bg-oksap-dark rounded-2xl flex items-center justify-center">
                 {aboutImages.length > 0 ? (
-                  <div className="relative w-full h-full overflow-hidden rounded-2xl">
-                    {aboutImages.map((image, index) => (
-                      <img
-                        key={image}
-                        src={image}
-                        alt="Imagen de Sobre Nosotros"
-                        className={`absolute inset-0 w-full h-full object-cover transition-all duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                          index === activeImage ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-                        }`}
-                        loading="lazy"
-                      />
-                    ))}
-                  </div>
+                  <AnimatedImage
+                    key={aboutImages[activeImage]}
+                    src={aboutImages[activeImage]}
+                    alt="Imagen de Sobre Nosotros"
+                    className="w-full h-full"
+                    imageClassName="object-cover"
+                    roundedClassName="rounded-2xl"
+                  />
                 ) : (
                   <div className="text-center px-4">
                     <p className="text-3xl font-black text-white mb-2">Carrusel</p>
